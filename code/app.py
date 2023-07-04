@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return render_template("jointplatform.html", title="Jinja and Flask")
+    return render_template("jointplatform.html", title="jp")
 
 if __name__ == "__main__":
     app.run(debug=True,port=8000)
