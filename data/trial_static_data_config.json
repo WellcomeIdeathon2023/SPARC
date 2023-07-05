@@ -246,15 +246,15 @@
             "conditions":[
                 {
                     "condition_conjunction": "and",
-                    "feature_names": ["use_technology","duration","follow_up_considered","support_sessions"],
-                    "feature_values": ["yes",["<", 200],"yes","yes"],
+                    "feature_names": ["duration","support_sessions"],
+                    "feature_values": [["<", 200],"yes"],
                     "alpha": 9,
                     "beta": 1
                 },
                 {
                     "condition_conjunction": "or",
-                    "feature_names": ["use_technology","duration","follow_up_considered","support_sessions"],
-                    "feature_values": ["no",[">=", 200],"no","no"],
+                    "feature_names": ["duration","support_sessions"],
+                    "feature_values": [[">=", 200],"no"],
                     "alpha": 6,
                     "beta": 4
                 }
