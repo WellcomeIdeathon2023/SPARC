@@ -1,0 +1,264 @@
+{   "n_samples": 1000,
+
+    "independent":{
+
+        "n_participant": {
+            "type": "int",
+            "distribution": "Uniform",
+            "low": 50,
+            "high": 100000
+        },
+        "duration": {
+            "type": "int",
+            "distribution": "truncatedNormal",
+            "mean": 50,
+            "std": 10,
+            "low": 4,
+            "high": 500
+        },
+        "age>65": {
+            "type": "float",
+            "distribution": "Beta",
+            "alpha": 3,
+            "beta": 7
+        },
+        "male": {
+            "type": "float",
+            "distribution": "Beta",
+            "alpha": 4,
+            "beta": 6
+        },
+        "ethnicity_white": {
+            "type": "float",
+            "distribution": "Beta",
+            "alpha": 7.5,
+            "beta": 2.5
+        },
+        "use_technology": {
+            "type": "category",
+            "n_categories": 2,
+            "values": [
+                "yes",
+                "no"
+            ],
+            "probs": [
+                0.5,
+                0.5
+            ]
+        },
+        "medication": {
+            "type": "category",
+            "n_categories": 6,
+            "values": [
+                "Escitalopram",
+                "Testosterone",
+                "Antidepressant",
+                "citalopram",
+                "venlafaxine",
+                "5ARI"
+            ],
+            "probs": [
+                0.2,
+                0.2,
+                0.2,
+                0.2,
+                0.1,
+                0.1
+            ]
+        },
+        "follow_up_considered": {
+            "type": "category",
+            "n_categories": 2,
+            "values": [
+                "yes",
+                "no"
+            ],
+            "probs": [
+                0.5,
+                0.5
+            ]
+        },
+        "use_wearables": {
+            "type": "category",
+            "n_categories": 2,
+            "values": [
+                "yes",
+                "no"
+            ],
+            "probs": [
+                0.5,
+                0.5
+            ]
+        },
+        "use_mobile_app": {
+            "type": "category",
+            "n_categories": 2,
+            "values": [
+                "yes",
+                "no"
+            ],
+            "probs": [
+                0.5,
+                0.5
+            ]
+        },
+        "interviews_needed": {
+            "type": "category",
+            "n_categories": 2,
+            "values": [
+                "yes",
+                "no"
+            ],
+            "probs": [
+                0.5,
+                0.5
+            ]
+        },
+        "questionare_completed": {
+            "type": "category",
+            "n_categories": 2,
+            "values": [
+                "yes",
+                "no"
+            ],
+            "probs": [
+                0.5,
+                0.5
+            ]
+        },
+        "feedback_provided": {
+            "type": "category",
+            "n_categories": 2,
+            "values": [
+                "yes",
+                "no"
+            ],
+            "probs": [
+                0.5,
+                0.5
+            ]
+        },
+        "prioir_treatment_history_considered": {
+            "type": "category",
+            "n_categories": 2,
+            "values": [
+                "yes",
+                "no"
+            ],
+            "probs": [
+                0.5,
+                0.5
+            ]
+        },
+        "co_mobidities_considered": {
+            "type": "category",
+            "n_categories": 2,
+            "values": [
+                "yes",
+                "no"
+            ],
+            "probs": [
+                0.5,
+                0.5
+            ]
+        },
+        "treatment_type": {
+            "type": "category",
+            "n_categories": 4,
+            "values": [
+                "medication",
+                "behavioural",
+                "rTMS",
+                "observational"
+            ],
+            "probs": [
+                0.25,
+                0.25,
+                0.25,
+                0.25
+            ]
+        },
+        "biosamples_collected": {
+            "type": "category",
+            "n_categories": 2,
+            "values": [
+                "yes",
+                "no"
+            ],
+            "probs": [
+                0.5,
+                0.5
+            ]
+        },
+        "randomised": {
+            "type": "category",
+            "n_categories": 2,
+            "values": [
+                "yes",
+                "no"
+            ],
+            "probs": [
+                0.5,
+                0.5
+            ]
+        },
+        "mutli_site": {
+            "type": "category",
+            "n_categories": 2,
+            "values": [
+                "yes",
+                "no"
+            ],
+            "probs": [
+                0.5,
+                0.5
+            ]
+        },
+        "adverse_event_considered": {
+            "type": "category",
+            "n_categories": 2,
+            "values": [
+                "yes",
+                "no"
+            ],
+            "probs": [
+                0.5,
+                0.5
+            ]
+        },
+        "support_sessions":{
+            "type": "category",
+            "n_categories": 2,
+            "values": [
+                "yes",
+                "no"
+            ],
+            "probs": [
+                0.5,
+                0.5
+            ]
+        }
+    },
+    "conditional":{
+        "retention_rate":{
+            "type": "float",
+            "distribution": "Beta",
+            "conditions":[
+                {
+                    "condition_conjunction": "and",
+                    "feature_names": ["use_technology","duration","follow_up_considered","support_sessions"],
+                    "feature_values": ["yes",["<", 200],"yes","yes"],
+                    "alpha": 9,
+                    "beta": 1
+                },
+                {
+                    "condition_conjunction": "or",
+                    "feature_names": ["use_technology","duration","follow_up_considered","support_sessions"],
+                    "feature_values": ["no",[">=", 200],"no","no"],
+                    "alpha": 6,
+                    "beta": 4
+                }
+            ]
+        }
+    }
+}

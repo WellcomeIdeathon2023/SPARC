@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.stats import truncnorm
+from scipy.stats import truncnorm, dirichlet,beta
 import pandas as pd
 import operator
 import json
@@ -29,6 +29,15 @@ def simulate_float_feature_by_truncatedNormal(n_samples, mean, std, low, high, s
     X = truncnorm.rvs((low - mean) / std, (high - mean) / std, loc=mean, scale=std, size=n_samples)
     return X
 
+def simulate_float_feature_by_Dirichlet(n_samples, alpha, seed=None):
+    np.random.seed(seed)
+    X = dirichlet.rvs(alpha, size=n_samples)
+    return X
+
+def simulate_float_feature_by_Beta(n_samples, a, b, seed=None):
+    np.random.seed(seed)
+    X = beta.rvs(a, b, size=n_samples)
+    return X
 
 def simulate_int_feature_by_Normal(n_samples, mean, std, seed=None):
     np.random.seed(seed)
@@ -39,6 +48,13 @@ def simulate_int_feature_by_Normal(n_samples, mean, std, seed=None):
 def simulate_int_feature_by_truncatedNormal(n_samples, mean, std, low, high, seed=None):
     np.random.seed(seed)
     X = truncnorm.rvs((low - mean) / std, (high - mean) / std, loc=mean, scale=std, size=n_samples)
+    X = np.rint(X)
+    return X
+
+
+def simulate_int_feature_by_Uniform(n_samples, low, high, seed=None):
+    np.random.seed(seed)
+    X = np.random.uniform(low=low, high=high, size=n_samples)
     X = np.rint(X)
     return X
 
@@ -73,20 +89,67 @@ def simulate_feature_by_config(feature_type, n_samples, config, seed=None):
             X = simulate_float_feature_by_Uniform(n_samples, config['low'], config['high'], seed=seed)
         elif config['distribution'] == 'truncatedNormal':
             X = simulate_float_feature_by_truncatedNormal(n_samples, config['mean'], config['std'], config['low'], config['high'], seed=seed)
+        elif config['distribution'] == 'Dirichlet':
+            X = simulate_float_feature_by_Dirichlet(n_samples, config['alpha'], seed=seed)
+        elif config['distribution'] == 'Beta':
+            X = simulate_float_feature_by_Beta(n_samples, config['alpha'], config['beta'], seed=seed)
         else:
-            raise ValueError('distribution should be one of Normal, Uniform, truncatedNormal')
+            raise ValueError('distribution should be one of Normal, Uniform, truncatedNormal, Dirichlet, Beta')
             
     elif feature_type == 'int':
         if config['distribution'] == 'Normal':
             X = simulate_int_feature_by_Normal(n_samples, config['mean'], config['std'], seed=seed)
         elif config['distribution'] == 'truncatedNormal':
             X = simulate_int_feature_by_truncatedNormal(n_samples, config['mean'], config['std'], config['low'], config['high'], seed=seed)
+        elif config['distribution'] == 'Uniform':
+            X = simulate_int_feature_by_Uniform(n_samples, config['low'], config['high'], seed=seed)
         else:
-            raise ValueError('distribution should be one of Normal, truncatedNormal')
+            raise ValueError('distribution should be one of Normal, truncatedNormal, Uniform')
         
     else:       
         raise ValueError('feature_type should be one of categorical, float, int')
     return X
+
+
+def get_index_by_single_condition(df, cond_f, cond_v):
+    
+    if df[cond_f].dtype.name == 'category':
+        sids = df[cond_f] == cond_v
+    else:
+        sids = np.ones_like(df.index, dtype=bool)
+        k = 0
+        while k < len(cond_v)-1:
+            op = op_map[cond_v[k]]
+            bound = cond_v[k+1]
+            sids = sids & op(df.loc[sids,cond_f], bound)
+            k+=2
+    return sids
+
+
+def simulate_feature_with_single_condition(df, fname, fconfig, cond, seed=None):
+    cond_f = cond['feature_name']
+    cond_v = cond['feature_value']
+    
+    sids = get_index_by_single_condition(df, cond_f, cond_v)
+    sids = df.index[sids]
+    df.loc[sids, fname] = simulate_feature_by_config(fconfig['type'], len(sids), cond, seed=seed)
+    return df
+
+
+def simulate_feature_with_multiple_conditions(df, fname, fconfig, conds, seed=None):
+        
+    conj = conds['condition_conjunction']
+    sids = np.ones_like(df.index, dtype=bool)
+    for cond_f,cond_v in zip(conds['feature_names'],conds['feature_values']):
+        if conj == 'and':
+            sids = sids & get_index_by_single_condition(df, cond_f, cond_v)
+        elif conj == 'or':
+            sids = sids | get_index_by_single_condition(df, cond_f, cond_v)
+        else:
+            raise ValueError('condition_conjunction should be one of and, or')
+    sids = df.index[sids]
+    df.loc[sids, fname] = simulate_feature_by_config(fconfig['type'], len(sids), conds, seed=seed)
+    return df
 
 
 def simulate_static_data_by_config(config, seed=None):
@@ -122,26 +185,15 @@ def simulate_static_data_by_config(config, seed=None):
     for fname, fconfig in cond_config.items():
         condtions = fconfig['conditions']
         for cond in condtions:
-            cond_f = cond['feature_name']
-            cond_v = cond['feature_value']
-            
             if fconfig['type'] != 'category':
                 cond['distribution'] = fconfig['distribution']
             else:
                 cond["n_categories"] = fconfig["n_categories"]
-            
-            if df[cond_f].dtype.name == 'category':
-                sids = df[df[cond_f] == cond_v].index
-            else:
-                sids = df.index
-                k = 0
-                while k < len(cond_v)-1:
-                    op = op_map[cond_v[k]]
-                    bound = cond_v[k+1]
-                    sids = sids[op(df.loc[sids,cond_f], bound)]
-                    k+=2
                 
-            df.loc[sids, fname] = simulate_feature_by_config(fconfig['type'], len(sids), cond, seed=seed)
+            if "condition_conjunction" not in cond.keys():
+                df = simulate_feature_with_single_condition(df, fname, fconfig, cond, seed=seed)
+            else:
+                df = simulate_feature_with_multiple_conditions(df, fname, fconfig, cond, seed=seed)
         
         if fconfig['type'] == 'category':
             for i, v in enumerate(fconfig["values"]):
@@ -151,10 +203,9 @@ def simulate_static_data_by_config(config, seed=None):
 
 
 
-
 parser = argparse.ArgumentParser()
-parser.add_argument('--config_path',default='../data/static_data_config.json', help='Path to config file')
-parser.add_argument('--save_path',default='../data/static_data.csv', help='Path to save data')
+parser.add_argument('--config_path',default='../data/trial_static_data_config.json', help='Path to config file')
+parser.add_argument('--save_path',default='../data/trial_static_data.csv', help='Path to save data')
 parser.add_argument('--seed',default=42,type=int, help='Random seed')
 
 args = parser.parse_args()
