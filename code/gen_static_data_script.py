@@ -140,15 +140,32 @@ def simulate_feature_with_multiple_conditions(df, fname, fconfig, conds, seed=No
         
     conj = conds['condition_conjunction']
     sids = np.ones_like(df.index, dtype=bool)
+    if conj == "linear":
+        df[fname] = conds['bias']
     for cond_f,cond_v in zip(conds['feature_names'],conds['feature_values']):
         if conj == 'and':
             sids = sids & get_index_by_single_condition(df, cond_f, cond_v)
         elif conj == 'or':
             sids = sids | get_index_by_single_condition(df, cond_f, cond_v)
+        elif 'linear' in conj:
+            if pd.api.types.is_categorical_dtype(df[cond_f]):
+                coef = cond_v[0]
+                value = cond_v[1]
+                df[fname] = df[fname] + coef*(df[cond_f]==value)
+            else:
+                df[fname] = df[fname] + cond_v*df[cond_f]
         else:
             raise ValueError('condition_conjunction should be one of and, or')
-    sids = df.index[sids]
-    df.loc[sids, fname] = simulate_feature_by_config(fconfig['type'], len(sids), conds, seed=seed)
+    if 'linear' not in conj:
+        sids = df.index[sids]
+        df.loc[sids, fname] = simulate_feature_by_config(fconfig['type'], len(sids), conds, seed=seed)
+    else:
+        if fconfig['distribution']=="Beta":
+            df.loc[df[fname]<0,fname] = 0
+            df.loc[df[fname]>1,fname] = 1
+        elif fconfig['distribution']=="truncatedNormal":
+            df.loc[df[fname]<fconfig['low'],fname] = fconfig['low']
+            df.loc[df[fname]>fconfig['high'],fname] = fconfig['high']
     return df
 
 
@@ -175,6 +192,7 @@ def simulate_static_data_by_config(config, seed=None):
     ### generate independent features first
     ind_config = config['independent']
     for fname, fconfig in ind_config.items():
+        seed += 1
         df[fname] = simulate_feature_by_config(fconfig['type'], n_samples, fconfig, seed=seed)
         if fconfig['type'] == 'category':
             for i, v in enumerate(fconfig["values"]):
@@ -183,6 +201,7 @@ def simulate_static_data_by_config(config, seed=None):
     ### generate dependent features
     cond_config = config['conditional']
     for fname, fconfig in cond_config.items():
+        seed += 1
         condtions = fconfig['conditions']
         for cond in condtions:
             if fconfig['type'] != 'category':

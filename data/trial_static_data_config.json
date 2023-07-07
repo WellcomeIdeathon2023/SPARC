@@ -1,4 +1,4 @@
-{   "n_samples": 1000,
+{   "n_samples": 50000,
 
     "independent":{
 
@@ -10,9 +10,7 @@
         },
         "duration": {
             "type": "int",
-            "distribution": "truncatedNormal",
-            "mean": 50,
-            "std": 10,
+            "distribution": "Uniform",
             "low": 4,
             "high": 500
         },
@@ -234,8 +232,8 @@
                 "no"
             ],
             "probs": [
-                0.5,
-                0.5
+                0.7,
+                0.3
             ]
         }
     },
@@ -245,18 +243,10 @@
             "distribution": "Beta",
             "conditions":[
                 {
-                    "condition_conjunction": "and",
+                    "condition_conjunction": "linear",
                     "feature_names": ["duration","support_sessions"],
-                    "feature_values": [["<", 200],"yes"],
-                    "alpha": 9,
-                    "beta": 1
-                },
-                {
-                    "condition_conjunction": "or",
-                    "feature_names": ["duration","support_sessions"],
-                    "feature_values": [[">=", 200],"no"],
-                    "alpha": 6,
-                    "beta": 4
+                    "feature_values": [-0.001,[0.05,"yes"]],
+                    "bias":0.9
                 }
             ]
         }
