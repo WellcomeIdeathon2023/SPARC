@@ -1,5 +1,9 @@
 # README
 
+# Simulated data
+'gen_static_data_script.py' generates the simulated data we used in this work.
+
+# Researcher Support Platform
 (1) 'Researcher Support Platform-v2.py' presents the python code of a simple UI as the basis for our solution to receive information from researchers on trial designs and produce an estimate of the retention rate and provide some suggestions. The objective is to extend it to have a dynamic suggestion system which requires more granualr information. Current system generate information based on simulated data. 
 
 The GUI (1) is currently working based on the simulated data to provide retention estimate and suggestions to improve retention (based on 'Counterfactual+recommend.ipynb').
@@ -10,8 +14,10 @@ The GUI (1) is currently working based on the simulated data to provide retentio
 
 'Counterfactual+recommend.ipynb' includes the retention estimate and recommendation system for (1).
 
+# Joint Research Platform
 (2) 'jointplatform.html' is a web interface showing the basis for a joint research platform on mental health research for (i) participants to reseagister their interest, (ii) researchers to get support and be matched to participants and (iii) both to be able interact. The final solution aims to provide a ML model to match participants to researchers with the main aim of long term retention. 
 
+# Participant Support Platform
 (3) Participantplatform.html is a web interface showing the basis for a participant support system which enables participants to receive training information, updates on the trial progress and the option to provide feedback. Access to this platform will password protected in the final solution. 
 'prg1.jpg', 'prg2.jpg', and 'trial.jpg' are used in this interface. 
 
