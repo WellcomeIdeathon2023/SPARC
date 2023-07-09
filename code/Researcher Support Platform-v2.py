@@ -32,9 +32,12 @@ def query_recommendation(query_x,target_y,model,query_features,max_iters=200):
     
     cf = []
     print(diff)
-    for i in range(len(diff)):
-        if diff[i]>0.01:
-            cf.append(query_features[i])
+    # for i in range(len(diff)):
+    #     if diff[i]>0.01:
+    #         cf.append(query_features[i])
+    cf.append(query_features[diff[feature_ids].argmax()])
+    cx = cx.detach().numpy().reshape(-1)
+    cx = cx[diff.argmax()]
     
     return cx,cy,cf
 
@@ -155,7 +158,7 @@ def submit_action():
         query_x = torch.Tensor(np.array(values).astype(np.float32))
         query_x = query_x.reshape(1,-1)
         cx, cy, cf = query_recommendation(query_x,target_y=torch.ones(query_x.shape[0])*target_y,query_features=query_features,model=model)
-        suggestion_label = tk.Label(pop_up_window, text="The recommendations is to change: "+ cf[0])
+        suggestion_label = tk.Label(pop_up_window, text=f"The recommendations is to change "+ cf[0]+ " to "+str(cx))
         suggestion_label.grid(row=1, column=0)
    # suggestion_label = tk.Label(pop_up_window, text="You need to change: ")
   #  suggestion_label.grid(row=1, column=0)
