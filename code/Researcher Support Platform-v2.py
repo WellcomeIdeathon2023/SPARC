@@ -58,10 +58,15 @@ def query_recommendation(query_x,target_y,model,query_features,max_iters=200):
        'use_technology_yes', 'use_wearables_no', 'use_wearables_yes']
 
     diff = torch.abs(query_x-cx).reshape(-1)
-    cf = features[diff>0]
+    cf = [features[i] for i in np.arange(len(features))[diff>0]]
     cx = cx[:,diff>0]
+    cx = cx.detach().numpy().reshape(-1)
+    if "duration" in cf:
+        index = cf.index("duration")
+        cx[index] = cx[index]*(500-4)+4
     
-    return cx.detach().numpy().reshape(-1),cy.detach().numpy(),cf
+    
+    return cx.astype(int),cy.detach().numpy(),cf
 
 def conterfactual_infer(query_x,target_y,feature_ids, model, loss_fn, max_iters):
     model.eval()
@@ -176,7 +181,7 @@ def submit_action():
         lrg = pickle.load(open('model-lr', 'rb'))
         model = Linear(weights=torch.Tensor(lrg.coef_),bias=torch.ones(1)*lrg.intercept_)
         model.load_state_dict(torch.load('model_weights.pth'))
-        values, pred = retention_action(False)
+        values, pred = retention_action(True)
         query_x = torch.Tensor(np.array(values).astype(np.float32))
         query_x = query_x.reshape(1,-1)
         cx, cy, cf = query_recommendation(query_x,target_y=torch.ones(query_x.shape[0])*target_y,query_features=query_features,model=model)
@@ -192,7 +197,7 @@ def recommendations_action():
     pop_up_window.title("Recommendations")
     pop_up_window.geometry("250x100")
     
-    values, pred = retention_action(False)
+    values, pred = retention_action(True)
     if sum(values) == 0:
         sug_label = tk.Label(pop_up_window, text='No value provided for design! \n please enter your design values first!')
         sug_label.grid(row=1, column=0)
