@@ -32,12 +32,9 @@ def query_recommendation(query_x,target_y,model,query_features,max_iters=200):
     
     cf = []
     print(diff)
-    # for i in range(len(diff)):
-    #     if diff[i]>0.01:
-    #         cf.append(query_features[i])
-    cf.append(query_features[diff[feature_ids].argmax()])
-    cx = cx.detach().numpy().reshape(-1)
-    cx = cx[diff.argmax()]
+    for i in range(len(diff)):
+        if diff[i]>0.01:
+            cf.append(query_features[i])
     
     return cx,cy,cf
 
@@ -134,7 +131,7 @@ def retention_action(flag=True):
     else:
         prd = model.predict(np.array(values).reshape(1, -1))
         if flag:
-            retention_label = tk.Label(pop_up_window, text="retention rate is: "+ str(round(prd[0]*100,2)))
+            retention_label = tk.Label(pop_up_window, text="Predicted retention rate is: "+ str(round(prd[0]*100,2)))
             retention_label.pack(pady=20)
     
     return values, prd
@@ -158,7 +155,7 @@ def submit_action():
         query_x = torch.Tensor(np.array(values).astype(np.float32))
         query_x = query_x.reshape(1,-1)
         cx, cy, cf = query_recommendation(query_x,target_y=torch.ones(query_x.shape[0])*target_y,query_features=query_features,model=model)
-        suggestion_label = tk.Label(pop_up_window, text=f"The recommendations is to change "+ cf[0]+ " to "+str(cx))
+        suggestion_label = tk.Label(pop_up_window, text="The recommendations is to change: "+ cf[0])
         suggestion_label.grid(row=1, column=0)
    # suggestion_label = tk.Label(pop_up_window, text="You need to change: ")
   #  suggestion_label.grid(row=1, column=0)
@@ -167,14 +164,14 @@ def submit_action():
 def recommendations_action():
     pop_up_window = tk.Toplevel(window)
     pop_up_window.title("Recommendations")
-    pop_up_window.geometry("300x100")
+    pop_up_window.geometry("250x100")
     
     values, pred = retention_action(False)
     if sum(values) == 0:
         sug_label = tk.Label(pop_up_window, text='No value provided for design! \n please enter your design values first!')
         sug_label.grid(row=1, column=0)
     else:
-        sug_label = tk.Label(pop_up_window, text="The current retention rate is "+ str(round(pred[0]*100,2)) +". \nPlease enter the % you want to achieve: ")
+        sug_label = tk.Label(pop_up_window, text="The predicted retention rate is "+ str(round(pred[0]*100,2)) +". \nPlease enter your desired rate (%): ")
         sug_label.grid(row=1, column=0)
         var = tk.StringVar()
         entry = tk.Entry(pop_up_window, validate="key", textvariable = var)
