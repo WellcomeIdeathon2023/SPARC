@@ -1,6 +1,6 @@
 # README
 
-This is your private repository for working on the challenges in the Wellcome Data Science Ideathon.
+This is the repository for the SPARC team working on the mental health challenges in the Wellcome Data Science Ideathon.
 This repository is maintained and monitored by Wellcome staff and will be made public after July 13 2023.
 Feel free to create additional folders in this repository but please use the existing ones as follows:
 

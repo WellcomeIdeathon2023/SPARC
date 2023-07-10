@@ -156,7 +156,7 @@ def retention_action(flag=True):
     else:
         prd = model.predict(np.array(values).reshape(1, -1))
         if flag:
-            retention_label = tk.Label(pop_up_window, text="retention rate is: "+ str(round(prd[0]*100,2)))
+            retention_label = tk.Label(pop_up_window, text="Predicted retention rate is: "+ str(round(prd[0]*100,2)))
             retention_label.pack(pady=20)
     
     return values, prd
@@ -190,14 +190,14 @@ def submit_action():
 def recommendations_action():
     pop_up_window = tk.Toplevel(window)
     pop_up_window.title("Recommendations")
-    pop_up_window.geometry("300x100")
+    pop_up_window.geometry("250x100")
     
     values, pred = retention_action(False)
     if sum(values) == 0:
         sug_label = tk.Label(pop_up_window, text='No value provided for design! \n please enter your design values first!')
         sug_label.grid(row=1, column=0)
     else:
-        sug_label = tk.Label(pop_up_window, text="The current retention rate is "+ str(round(pred[0]*100,2)) +". \nPlease enter the % you want to achieve: ")
+        sug_label = tk.Label(pop_up_window, text="The predicted retention rate is "+ str(round(pred[0]*100,2)) +". \nPlease enter your desired rate (%): ")
         sug_label.grid(row=1, column=0)
         var = tk.StringVar()
         entry = tk.Entry(pop_up_window, validate="key", textvariable = var)
