@@ -244,8 +244,8 @@
             "conditions":[
                 {
                     "condition_conjunction": "linear",
-                    "feature_names": ["duration","support_sessions"],
-                    "feature_values": [-0.001,[0.05,"yes"]],
+                    "feature_names": ["duration","age>65","support_sessions"],
+                    "feature_values": [-0.001,0.05,[0.05,"yes"]],
                     "bias":0.9
                 }
             ]

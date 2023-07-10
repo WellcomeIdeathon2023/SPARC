@@ -28,18 +28,40 @@ def query_recommendation(query_x,target_y,model,query_features,max_iters=200):
     
     cx,cy = conterfactual_infer(query_x,target_y,feature_ids, model, loss_fn, max_iters)
     
-    diff = torch.abs(query_x-cx).reshape(-1)
+    # diff = torch.abs(query_x-cx).reshape(-1)
     
-    cf = []
-    print(diff)
+    # cf = []
+    # print(diff)
     # for i in range(len(diff)):
     #     if diff[i]>0.01:
     #         cf.append(query_features[i])
-    cf.append(query_features[diff[feature_ids].argmax()])
-    cx = cx.detach().numpy().reshape(-1)
-    cx = cx[diff.argmax()]
+    # cf.append(query_features[diff[feature_ids].argmax()])
+    # cx = cx.detach().numpy().reshape(-1)
+    # cx = cx[diff.argmax()]
+    features = ['n_participant', 'duration', 'age>65', 'male', 'ethnicity_white',
+       'adverse_event_considered_no', 'adverse_event_considered_yes',
+       'biosamples_collected_no', 'biosamples_collected_yes',
+       'co_mobidities_considered_no', 'co_mobidities_considered_yes',
+       'feedback_provided_no', 'feedback_provided_yes',
+       'follow_up_considered_no', 'follow_up_considered_yes',
+       'interviews_needed_no', 'interviews_needed_yes', 'medication_5ARI',
+       'medication_Antidepressant', 'medication_Escitalopram',
+       'medication_Testosterone', 'medication_citalopram',
+       'medication_venlafaxine', 'mutli_site_no', 'mutli_site_yes',
+       'prioir_treatment_history_considered_no',
+       'prioir_treatment_history_considered_yes', 'questionare_completed_no',
+       'questionare_completed_yes', 'randomised_no', 'randomised_yes',
+       'support_sessions_no', 'support_sessions_yes',
+       'treatment_type_behavioural', 'treatment_type_medication',
+       'treatment_type_observational', 'treatment_type_rTMS',
+       'use_mobile_app_no', 'use_mobile_app_yes', 'use_technology_no',
+       'use_technology_yes', 'use_wearables_no', 'use_wearables_yes']
+
+    diff = torch.abs(query_x-cx).reshape(-1)
+    cf = features[diff>0]
+    cx = cx[:,diff>0]
     
-    return cx,cy,cf
+    return cx.detach().numpy().reshape(-1),cy.detach().numpy(),cf
 
 def conterfactual_infer(query_x,target_y,feature_ids, model, loss_fn, max_iters):
     model.eval()
@@ -158,7 +180,8 @@ def submit_action():
         query_x = torch.Tensor(np.array(values).astype(np.float32))
         query_x = query_x.reshape(1,-1)
         cx, cy, cf = query_recommendation(query_x,target_y=torch.ones(query_x.shape[0])*target_y,query_features=query_features,model=model)
-        suggestion_label = tk.Label(pop_up_window, text=f"The recommendations is to change "+ cf[0]+ " to "+str(cx))
+        qstr = " ".join([cf[i]+" --> "+str(cx[i])+";" for i in range(len(cf))])
+        suggestion_label = tk.Label(pop_up_window, text=f"The recommendations is to change:"+ qstr+'\n The new retention rate would be '+str(cy[0].round(3)))
         suggestion_label.grid(row=1, column=0)
    # suggestion_label = tk.Label(pop_up_window, text="You need to change: ")
   #  suggestion_label.grid(row=1, column=0)
