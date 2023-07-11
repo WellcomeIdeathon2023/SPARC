@@ -14,7 +14,7 @@ For running the GUI, please run:
 
 A page will be represented to enter the design information. Please see below an example:
 
-![plot] (step1.png)
+![plot] (./step1.png)
 
 Then you can press an retention estimate to get and estimate of your retention rate:
 
@@ -27,7 +27,7 @@ This folder include the code for recommender system.
 'Counterfactual_recommend.ipynb' includes the retention estimate and recommendation system. model-lr and model_weights.pth are learnt on simulated data and saved to be used in the platform.
 
 # Joint Research Platform
-(2) 'jointplatform.html' is a web interface showing the basis for a joint research platform on mental health research for (i) participants to reseagister their interest, (ii) researchers to get support and be matched to participants and (iii) both to be able interact. The final solution aims to provide a ML model to match participants to researchers with the main aim of long term retention. 
+'jointplatform.html' is a web interface showing the basis for a joint research platform on mental health research for (i) participants to reseagister their interest, (ii) researchers to get support and be matched to participants and (iii) both to be able interact. The final solution aims to provide a ML model to match participants to researchers with the main aim of long term retention. 
 
 'html code - researcher platform' includes that html codes for web interface.
 
