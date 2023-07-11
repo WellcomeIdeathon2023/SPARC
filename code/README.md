@@ -1,4 +1,5 @@
 # README
+We aim to address the challenges of participant retention in long-term mental health clinical trials by providing researchers with estimation and guidance, enabling seamless communication between researchers and participants, and empowering participants with information and resources to stay engaged in the trials. At this stage, we have laid the foundation for our final solution. We divided our solution to three platforms; researcher support platform, joint research platform, and participant platform.
 
 # Simulated data
 'gen_static_data_script.py' generates the simulated data we used in this work.
