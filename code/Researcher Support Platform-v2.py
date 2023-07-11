@@ -184,7 +184,7 @@ def submit_action():
         lrg = pickle.load(open('model-lr', 'rb'))
         model = Linear(weights=torch.Tensor(lrg.coef_),bias=torch.ones(1)*lrg.intercept_)
         model.load_state_dict(torch.load('model_weights.pth'))
-        values, pred = retention_action(True)
+        values, pred = retention_action(False)
         query_x = torch.Tensor(np.array(values).astype(np.float32))
         query_x = query_x.reshape(1,-1)
         cx, cy, cf = query_recommendation(query_x,target_y=torch.ones(query_x.shape[0])*target_y,query_features=query_features,model=model)
@@ -200,7 +200,7 @@ def recommendations_action():
     pop_up_window.title("Recommendations")
     pop_up_window.geometry("250x100")
     
-    values, pred = retention_action(True)
+    values, pred = retention_action(False)
     if sum(values) == 0:
         sug_label = tk.Label(pop_up_window, text='No value provided for design! \n please enter your design values first!')
         sug_label.grid(row=1, column=0)
