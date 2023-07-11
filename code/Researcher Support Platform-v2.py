@@ -66,7 +66,7 @@ def query_recommendation(query_x,target_y,model,query_features,max_iters=200):
         cx[index] = cx[index]*(500-4)+4
     
     
-    return cx.astype(int),cy.detach().numpy(),cf
+    return cx,cy.detach().numpy(),cf
 
 def conterfactual_infer(query_x,target_y,feature_ids, model, loss_fn, max_iters):
     model.eval()
@@ -76,9 +76,10 @@ def conterfactual_infer(query_x,target_y,feature_ids, model, loss_fn, max_iters)
     cf_optimizer = torch.optim.Adam([cx], lr=0.01)
     mask = torch.ones_like(query_x).type(torch.bool)
     mask[:,feature_ids] = False
+    cost_loss = torch.nn.L1Loss(reduction='mean')
     for it in tqdm_range:
         cy = model(cx)
-        loss = loss_fn(cy,target_y)#loss_fn(query_x,cx,cy,target_y,feature_ids)
+        loss = loss_fn(cy,target_y)+cost_loss(query_x,cx)#loss_fn(query_x,cx,cy,target_y,feature_ids)
         loss.backward()
         cx.grad[mask]=0.
         cf_optimizer.step()
@@ -104,7 +105,7 @@ def help_action():
 def retention_action(flag=True):
     values = []
     # estimate retention based on saved model
-    continuous = ["Number of Participants", "Study Duration - weeks","Age range 18-65 %", "Male %", "White ethnicity %"]
+    continuous = ["Number of Participants", "Study Duration - weeks","Age > 65 %", "Male %", "White ethnicity %"]
     medication_list = ['Testosterone', '5ARI', 'citalopram', 'Antidepressant',
        'Escitalopram', 'venlafaxine'] #a small list to be updated for final solution
     
@@ -123,17 +124,19 @@ def retention_action(flag=True):
     model = pickle.load(open('model-lr', 'rb'))
     
     for name, _ in name_entry.items():
+        print(name)
         x = entries[name].get()
         if x == '' and name in continuous:
             values.append(0)
         elif name in continuous:
             x = int(x)
             if name == "Number of Participants":
-                x = x/99999 # normalise to maximum possible participants
+                x = (x-50)/(100000-50) # normalise to maximum possible participants
             elif name == "Study Duration - weeks":
-                x = x/500
+                x = (x-4)/(500-4)
             else:
                 x = x/100
+            print(x)
             values.append(x)
         else: 
             if name == 'Medication':
@@ -185,7 +188,7 @@ def submit_action():
         query_x = torch.Tensor(np.array(values).astype(np.float32))
         query_x = query_x.reshape(1,-1)
         cx, cy, cf = query_recommendation(query_x,target_y=torch.ones(query_x.shape[0])*target_y,query_features=query_features,model=model)
-        qstr = " ".join([cf[i]+" --> "+str(cx[i])+";" for i in range(len(cf))])
+        qstr = " ".join([cf[i]+" --> "+str(cx[i].round(3))+";" for i in range(len(cf))])
         suggestion_label = tk.Label(pop_up_window, text=f"The recommendations is to change:"+ qstr+'\n The new retention rate would be '+str(cy[0].round(3)))
         suggestion_label.grid(row=1, column=0)
    # suggestion_label = tk.Label(pop_up_window, text="You need to change: ")
@@ -256,7 +259,7 @@ canvas.create_window((0, 0), window=window_frame, anchor="nw")
 name_entry = {
     "Number of Participants": None,
     "Study Duration - weeks": None,
-    "Age range 18-65 %": None,
+    "Age > 65 %": None,
     "Male %": None,
     "White ethnicity %": None,
     "Adverse event considered": None,
@@ -291,7 +294,7 @@ for name, _ in name_entry.items():
         entry.grid(row=i, column=1)
 
         entries[name] = entry
-    elif name in ["Age range 18-65 %", "Male %", "White ethnicity %"]:
+    elif name in ["Age > 65 %", "Male %", "White ethnicity %"]:
         var = tk.StringVar()
         entry = tk.Entry(window_frame, validate="key", textvariable = var)
         entry.configure(validatecommand=(entry.register(validate_percentage), "%P"))
