@@ -16,7 +16,7 @@ A page will be represented to enter the design information. Please see below an 
 
 ![Alt text](https://github.com/WellcomeIdeathon2023/SPARC/blob/main/code/step1.png)
 
-Then you can press an Retention Rate to get and estimate of your retention rate:
+Then you can press an Retention Rate to get and estimate of your retention rate. If you are looking for recommnedations to increse the retention you can you Recoomendations and enter your desired value.
 
 
 
