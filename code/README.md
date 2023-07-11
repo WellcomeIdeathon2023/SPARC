@@ -8,7 +8,7 @@ We aim to address the challenges of participant retention in long-term mental he
 python gen_static_data_script.py --config_path config.json --save_path output.csv --seed 0
 ```
 
-Please find instructions for the json config file [here](https://github.com/WellcomeIdeathon2023/SPARC/blob/main/data/config_static_data_simulator.md).
+Please find instructions for the json config file [here](https://github.com/WellcomeIdeathon2023/SPARC/blob/main/data/README.md).
 
 # Researcher Support Platform
 'Researcher Support Platform-v2.py' presents the python code of a simple UI as the basis for our solution to receive information from researchers on their trial designs and produce an estimate of the retention rate and provide some suggestions on how to improve retention rate. The objective is to extend it to have a dynamic suggestion system which requires more granualr information. 
