@@ -223,8 +223,8 @@ def simulate_static_data_by_config(config, seed=None):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--config_path',default='../data/trial_static_data_config.json', help='Path to config file')
-parser.add_argument('--save_path',default='../data/trial_static_data.csv', help='Path to save data')
+parser.add_argument('--config_path',default='./trial_static_data_config.json', help='Path to config file')
+parser.add_argument('--save_path',default='./trial_static_data.csv', help='Path to save data')
 parser.add_argument('--seed',default=42,type=int, help='Random seed')
 
 args = parser.parse_args()
