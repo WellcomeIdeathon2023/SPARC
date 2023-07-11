@@ -1,6 +1,6 @@
 # README
-model is a pickle file saved from the model to be used in the platform for retention estimate
+Wellcome-Data-idealthon-updated.pptx is the presentation of our work. 
 
 Variables to consider is an early set of variables and the link and corresponding information from a number of trials that we have checked. This was done as an early litereture search to understand available information per trials and the possiblity of estimating retention rate. 
 
-Welcome-idealthon-proposal and budget includes the proposed next steps and requested budget.
+Welcome-idealthon-proposal and budget include the proposed next steps and requested budget.
