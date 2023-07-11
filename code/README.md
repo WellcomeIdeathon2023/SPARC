@@ -12,9 +12,13 @@ For running the GUI, please run:
 
     python Researcher_Support_Platform.py
 
-Then you need to enter the design information. 
+A page will be represented to enter the design information. Please see below an example:
 
-![alt text](http://url/to/img.png)
+![alt text](http://url/to/step1.png)
+
+Then you can press an retention estimate to get and estimate of your retention rate:
+
+
 
 # notebook
 
