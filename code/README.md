@@ -14,6 +14,8 @@ For running the GUI, please run:
 
 Then you need to enter the design information. 
 
+![alt text](http://url/to/img.png)
+
 # notebook
 
 This folder include the code for recommender system.
