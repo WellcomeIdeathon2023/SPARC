@@ -14,7 +14,7 @@ For running the GUI, please run:
 
 A page will be represented to enter the design information. Please see below an example:
 
-![plot] (./step1.png)
+![plot] (./code/step1.png)
 
 Then you can press an retention estimate to get and estimate of your retention rate:
 
